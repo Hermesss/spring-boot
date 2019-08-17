@@ -1,2 +1,14 @@
 ---
+- hosts: qa
 # tasks file for provision-ci-qa
+  become: yes
+  tasks:
+  - name: install JAVA
+    apt:
+      name: openjdk-8-jdk
+      state: present
+
+  - name: install Docker    
+    apt:
+      name: docker
+      state: present

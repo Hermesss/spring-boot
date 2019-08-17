@@ -1,5 +1,5 @@
 ---
-- hosts: ci
+- hosts: {{ ENV}}
   tasks:
 # defaults file for deploy-to-ci
     - name: dependencies install lmxl

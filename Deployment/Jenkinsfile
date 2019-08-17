@@ -54,16 +54,24 @@ pipeline {
             }
         
         }
-        stage(CI DEPLOY) {
+        stage(CI_DEPLOY) {
             steps {
-                dir ('deployment') {
+                dir ('Deployment') {
                     echo "====++++Deploying to CI++++===="
-                    sh 'ansible-playbook -i /var/lib/jenkins/workspacegraduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspacegraduate/Deployment/roles/delpoy -e 'BUILD_NUMBER=${env.BUILD_NUMBER}''
+                    sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
                 }
             }
 
         }
-    
+        stage("deploy to QA") {
+            input {
+                message "Should we deploy to QA env?"
+            }
+            steps {
+                echo "====++++Deploying to QA++++===="
+                sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
+            }
+        }
     }
     
 }
