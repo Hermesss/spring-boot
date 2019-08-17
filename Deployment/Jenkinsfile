@@ -32,7 +32,7 @@ pipeline {
                     id: "Artifactory",
                     url: "http://localhost:8081/artifactory",
                     // If you're using username and password:
-                    username: "jenkins ",
+                    username: "jenkins",
                     password: "medion88"
                 )      
                 rtUpload (
@@ -41,7 +41,7 @@ pipeline {
                         """{
                         "files": [
                             {
-                            "pattern": "/var/lib/jenkins/workspace/CHECKOUT/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
+                            "pattern": "/var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
                             "target": "libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar"
                             }
                         ]
@@ -58,7 +58,7 @@ pipeline {
             steps {
                 dir ('deployment') {
                     echo "====++++Deploying to CI++++===="
-                    sh 'ansible-playbook -i ci-servers site.yml'
+                    sh 'ansible-playbook -i /var/lib/jenkins/workspacegraduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspacegraduate/Deployment/roles/delpoy -e 'BUILD_NUMBER=${env.BUILD_NUMBER}''
                 }
             }
 
