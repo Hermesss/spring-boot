@@ -1,0 +1,30 @@
+---
+- hosts: devtools
+  become: yes 
+  tasks:
+        # - name: install certain pip modules for docker
+        #   pip:
+        #      name: "{{ item.name}}"
+        #      version: "{{ item.version}}"
+        #      state: present
+        #   with_items:
+        #   - { name: docker, version: 2.0.0 }
+        #  # - { name: docker-py, version: 1.10.6 }
+
+        - template:
+            dest: /tmp/dockerfile # required. Location to render the template to on the remote machine.
+            src: application.dockerfile.j2 # required. Path of a Jinja2 formatted template on the Ansible controller. This can be a relative or absolute path.
+            # owner: root  # not required. Name of the user that should own the file/directory, as would be fed to I(chown).
+            # group: root # not required. Name of the group that should own the file/directory, as would be fed to I(chown).
+            # mode: 0755 # not required. Mode the file or directory should be. For those used to I(/usr/bin/chmod) remember that modes are actually octal numbers.  You must either add a leading zero so that Ansible's YAML parser knows it is an octal number (like C(0644) or C(01777)) or quote it (like C('644') or C('1777')) so Ansible receives a string and can do its own conversion from string into number.  Giving Ansible a number without following one of these rules will end up with a decimal number which will have unexpected results.  As of version 1.8, the mode may be specified as a symbolic mode (for example, C(u+rwx) or C(u=rw,g=r,o=r)).  As of version 2.6, the mode may also be the special string C(preserve).  C(preserve) means that the file will be given the same permissions as the source file.
+            # backup: no # not required. Create a backup file including the timestamp information so you can get the original file back if you somehow clobbered it incorrectly.
+        
+        - name: image build and push to repo
+          command: 
+            docker build -t denhermesss/graduate:{{ BUILD_NUMBER }} /tmp
+        - name: DTR login
+          command: 
+           docker login -u denhermesss -p medion88 
+        - name: image push
+          command: docker push denhermesss/graduate:{{ BUILD_NUMBER }}
+          

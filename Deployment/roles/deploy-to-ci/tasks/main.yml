@@ -1,0 +1,17 @@
+---
+# defaults file for deploy-to-ci
+    - hosts: devtools
+      become: yes 
+      tasks:
+       - name: dependencies install lmxl
+         apt:
+          name: python-lxml 
+          state: present
+       - name: get artifact from Artifacorty
+         get_url:
+          dest: /tmp # required. Absolute path of where to download the file to.,If C(dest) is a directory, either the server provided filename or, if none provided, the base name of the URL on the remote server will be used. If a directory, C(force) has no effect.,If C(dest) is a directory, the file will always be downloaded (regardless of the C(force) option), but replaced only if the contents changed..
+          url: http://{{ ansible_default_ipv4['address'] }}:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{BUILD_NUMBER}}.jar # required. HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
+          
+       - name: run java app
+         shell: java -jar /tmp/spring-boot-smoke-test-web-ui-{{BUILD_NUMBER}}.jar --server.port=8088
+            

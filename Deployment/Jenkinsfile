@@ -1,0 +1,69 @@
+pipeline {
+
+    agent any
+    environment {
+        finalname = "spring-boot-smoke-test-web-ui-${env.BUILD_NUMBER}"
+    }
+    tools {
+        maven "LOCALMAVEN"
+        jdk 'javalocal'
+    }
+     
+    stages {
+        stage(CHECKOUT) {
+            //git repo checkout
+            steps {
+                git 'https://github.com/Hermesss/spring-boot.git'
+            }
+        }
+        stage(BUILD) {
+            steps {
+                sh "mvn clean  install -f /var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
+                
+                }
+
+
+        }
+        
+        
+        stage(UPLOAD) {
+            steps {
+                rtServer (
+                    id: "Artifactory",
+                    url: "http://localhost:8081/artifactory",
+                    // If you're using username and password:
+                    username: "jenkins ",
+                    password: "medion88"
+                )      
+                rtUpload (
+                    serverId: "Artifactory",
+                    spec:
+                        """{
+                        "files": [
+                            {
+                            "pattern": "/var/lib/jenkins/workspace/CHECKOUT/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
+                            "target": "libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar"
+                            }
+                        ]
+                        }"""
+                ) 
+                rtPublishBuildInfo (
+                    serverId: "Artifactory"
+                ) 
+
+            }
+        
+        }
+        stage(CI DEPLOY) {
+            steps {
+                dir ('deployment') {
+                    echo "====++++Deploying to CI++++===="
+                    sh 'ansible-playbook -i ci-servers site.yml'
+                }
+            }
+
+        }
+    
+    }
+    
+}
