@@ -1,5 +1,5 @@
 ---
-- hosts: qa
+- hosts: qa, ci
 # tasks file for provision-ci-qa
   become: yes
   tasks:
