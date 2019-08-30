@@ -1,2 +1,9 @@
 ---
-#site.yml
+- hosts: tag_Name_devtools
+  vars:
+    ansible_ssh_private_key_file: "/Users/admin/awskey/testkp.pem"
+    ansible_ssh_user: "ubuntu"
+  become: yes
+  roles:
+  # - provision-ci-qa 
+   - deploy_devtools

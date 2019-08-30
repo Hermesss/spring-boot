@@ -1,0 +1,10 @@
+[all:vars]
+ = ~/awskey/testkp.pem
+[artifactory] 
+3.16.48.170
+[ci]
+18.222.65.87
+[devtools]
+3.14.143.51
+[qa]
+18.224.31.188

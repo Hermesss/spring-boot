@@ -1,0 +1,56 @@
+1. Install Jenkins on Ubuntu server 18.04
+    a. Install Java JDK 8 https://www.digitalocean.com/community/tutorials/how-to-install-java-with-apt-on-ubuntu-18-04#installing-specific-versions-of-openjdk
+    sudo apt install openjdk-8-jdk
+    b.Install Jenkins
+        i. wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+        ii. sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+        iii. sudo apt update
+        iv. sudo apt install jenkins
+    c. Start Jenkins   
+        i. sudo systemctl start jenkins
+        ii. sudo systemctl status jenkins
+        iii. sudo ufw allow 8080 (open the Firewall), to confirm sudo ufw status
+    d. Jenkins initial setup http://your_server_ip_or_domain:8080
+        i. Initial password sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+        ii. Plugins setup (maven, git, artifactory, matrix roles....)
+    e. Setup Maven 
+        wget https://www-us.apache.org/dist/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz -P /tmp
+        sudo tar xf /tmp/apache-maven-*.tar.gz -C /opt
+        sudo ln -s /opt/apache-maven-3.6.0 /opt/maven
+        sudo nano /etc/profile.d/maven.sh
+            "export JAVA_HOME=/usr/lib/jvm/java-8-openjdk-amd64
+            export M2_HOME=/opt/maven
+            export MAVEN_HOME=/opt/maven
+            export PATH=${M2_HOME}/bin:${PATH}"
+        sudo chmod +x /etc/profile.d/maven.sh
+        source /etc/profile.d/maven.sh
+        mvn -version
+    f. Setup git
+        sudo apt update
+        sudo apt install git
+        git config --global user.name "Den"
+        git config --global user.email "den.hermesss@gmail.com"
+    j. Setup artifactory
+        i. Setup Docker
+            sudo apt-get update
+            "sudo apt-get install apt-transport-https \
+            ca-certificates \
+            curl \
+            software-properties-common"
+            curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+            sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
+            sudo apt-get update
+            sudo apt-get install docker-ce
+        ii. docker pull docker.bintray.io/jfrog/artifactory-oss:latest
+            docker pull docker.bintray.io/jfrog/artifactory-cpp-ce
+            sudo mkdir -p /jfrog/artifactory
+            sudo chown -R 1030 /jfrog/
+            "docker run --name artifactory -d -p 8081:8081 \
+            -v /jfrog/artifactory:/var/opt/jfrog/artifactory \
+            docker.bintray.io/jfrog/artifactory-oss:latest"
+            docker run --name artifactory -d -p 8081:8081 \
+            -v /jfrog/artifactory:/var/opt/jfrog/artifactory \
+            -e EXTRA_JAVA_OPTIONS='-Xms512m -Xmx2g -Xss256k -XX:+UseG1GC' \
+            docker.bintray.io/jfrog/artifactory-pro:latest
+
+    

@@ -1,0 +1,4 @@
+---
+# handlers file for deploy_jenkins
+- name: restart jenkins
+  service: name=jenkins state=restarted

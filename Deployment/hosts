@@ -5,3 +5,5 @@
 192.168.1.177 ansible_user=den ansible_ssh_pass=medion88 ansible_sudo_pass=medion88
 [qa]
 192.168.1.115 ansible_user=den ansible_ssh_pass=medion88 ansible_sudo_pass=medion88
+[artifactory]
+192.168.1.232 ansible_user=den ansible_ssh_pass=medion88 ansible_sudo_pass=medion88

@@ -1,0 +1,13 @@
+---
+#tasks:
+ - name: check docker is installed
+   apt: 
+     name: docker.io
+     state: present
+
+ - name: run docker container
+   docker_container:  
+     image:denhermesss/graduate:{{ BUILD_NUMBER }}  
+     name:springbootapp
+     published_ports:{{ CONTAINER_PORT:CONTAINER_PORT }}
+     state:started
