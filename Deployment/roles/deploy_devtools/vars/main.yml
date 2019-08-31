@@ -20,6 +20,7 @@ jenkins_plugins:
   - artifactory
   - github
   - matrix-auth
+  - workflow-aggregator
 jenkins_url: "http://127.0.0.1"  # The url that Jenkins will be accessible on
 jenkins_port: "8080"  # The port that Jenkins will listen on
 jenkins_admin: "admin@example.com"  # The administrator email address for the server  

@@ -13,6 +13,8 @@
         - curl
         - apt-transport-https
         - openjdk-8-jdk
+        - git
+        - maven
         state: present
     - name: Create Jenkins group
       group:
@@ -119,8 +121,8 @@
         timeout: 5
         force_basic_auth: yes
       register: jenkins_service_status
-      retries: 10
-      delay: 5
+      retries: 15
+      delay: 10
       until: >
         'status' in jenkins_service_status and
         jenkins_service_status['status'] == 200
@@ -133,6 +135,8 @@
         group: "{{ jenkins_config_group }}"
         url: "{{ jenkins_url }}:{{ jenkins_port }}"
         timeout: "{{ jenkins_plugin_timeout }}"
+        url_username: "{{ jenkins_admin_username }}"
+        url_password: "{{ jenkins_admin_password }}"
       with_items: "{{ jenkins_plugins }}"
 
     - name: stop jenkins
