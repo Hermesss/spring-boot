@@ -14,6 +14,28 @@
         - apt-transport-https
         - openjdk-8-jdk
         state: present
+    - name: Create Jenkins group
+      group:
+        name: "{{ jenkins_config_group }}"
+        state: present
+
+    - name: Create Jenkins user
+      user:
+        name: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+        home: "{{ jenkins_home }}"
+        shell: "/bin/false"
+        state: present
+    - name: Set JENKINS_HOME
+      lineinfile:
+        dest: /etc/default/jenkins
+        line: "JENKINS_HOME={{ jenkins_home }}"
+        regexp: '^JENKINS_HOME='
+    - name: Set Jenkins port
+      lineinfile:
+        dest: /etc/default/jenkins
+        regexp: '^HTTP_PORT='
+        line: "HTTP_PORT={{ jenkins_port }}"
 
     - name: Add Jenkins apt repository key.
       apt_key:
@@ -31,6 +53,10 @@
         update_cache: yes
         name: jenkins
         state: present
+    - name: stop jenkins
+      service:
+        name: jenkins
+        state: stopped
 
     - name: Create initialization scripts directory
       file: path={{ jenkins_home }}/init.groovy.d
@@ -45,6 +71,7 @@
             owner=jenkins
             group=jenkins
             mode=0775   
+
     - name: Jenkins - configure | Turn off Jenkins setup wizard
       lineinfile: 
           dest=/etc/default/jenkins 
@@ -52,57 +79,67 @@
           line='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
       notify: restart jenkins
     
+    - name: Ensure correct ownership of JENKINS_HOME directory
+      file:
+        path: "{{ jenkins_home }}"
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+        mode: 0755
+        state: directory
+
+    - name: Configuration file is up to date (config.xml)
+      template:
+        src: "{{ jenkins_source_config_xml }}"
+        dest: "{{ jenkins_home }}/config.xml"
+        mode: 0644
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+
+    - name: Configure Jenkins location
+      template:
+        src: files/jenkins.model.JenkinsLocationConfiguration.xml.j2
+        dest: "{{ jenkins_home }}/jenkins.model.JenkinsLocationConfiguration.xml"
+        mode: 0644
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
 
     - name: Start the server
       service:
         name: jenkins
         state: started
 
-    # - name: Wait for Jenkins to start up
-    #   uri:
-    #     url: http://localhost:8080
-    #     status_code: 200
-    #     user: "{{ jenkins_admin_username }}"
-    #     password: "{{ jenkins_admin_password }}"
-    #     timeout: 5
-    #     force_basic_auth: yes
-    #     register: jenkins_service_status
-    #     retries: 10
-    #     delay: 5
-    #     until: >
-    #       'status' in jenkins_service_status and
-    #       jenkins_service_status['status'] == 200
-    
-    # - name: Check Jenkins status
-    #   debug:
-    #    msg: "Jenkins status: {{ jenkins_service_status['status'] }}"
 
-    - name: install plugin
+    
+    - name: Install plugins
       jenkins_plugin:
         name: "{{ item }}"
-        state: latest
-        url_username: "{{jenkins_admin_username}}"
-        url_password: "{{jenkins_admin_password}}"
-        url: http://localhost:8080
-      with_items: "build-pipeline-plugin"
+        jenkins_home: "{{ jenkins_home }}"
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+        url: "{{ jenkins_url }}:{{ jenkins_port }}"
+        timeout: "{{ jenkins_plugin_timeout }}"
+      with_items: "{{ jenkins_plugins }}"
 
-    - name: create job directory
-      file: 
-        path={{ jenkins_home }}/jobs/graduate
-        state=directory
-        owner=jenkins
-        group=jenkins
-        mode=0775  
- 
-    # - name: copy jenkins job file from github
-    #   get_url:
-    #   url: https://github.com/Hermesss/spring-boot/blob/master/Deployment/config.xml
-    #   dest: /var/lib/jenkins/jobs/graduate
-    #   owner: jenkins
-    #   group: jenkins
-    #   mode: 0655
-
-    - name: ReStart the server
+    - name: stop jenkins
       service:
         name: jenkins
-        state: restarted
+        state: stopped
+
+    - name: Job directories are present
+      file:
+        path: "{{ jenkins_home }}/jobs/{{ item }}"
+        state: directory
+        mode: 0777
+      with_items: "{{ jenkins_jobs }}"
+ 
+    - name: Jobs are present
+      copy:
+        src: "{{ jenkins_source_dir_jobs }}/{{ item }}/config.xml"
+        dest: "{{ jenkins_home }}/jobs/{{ item }}/config.xml"
+        mode: 0777
+      with_items: "{{ jenkins_jobs }}"
+
+    - name: Start the server
+      service:
+        name: jenkins
+        state: started
