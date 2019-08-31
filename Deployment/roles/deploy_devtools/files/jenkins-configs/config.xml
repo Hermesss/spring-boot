@@ -15,16 +15,10 @@
   </securityRealm>
   <disableRememberMe>false</disableRememberMe>
   <projectNamingStrategy class="jenkins.model.ProjectNamingStrategy$DefaultProjectNamingStrategy"/>
-  <workspaceDir>${JENKINS_HOME}/workspace/${ITEM_FULL_NAME}</workspaceDir>
+  <workspaceDir>${ITEM_ROOTDIR}/workspace</workspaceDir>
   <buildsDir>${ITEM_ROOTDIR}/builds</buildsDir>
   <markupFormatter class="hudson.markup.EscapedMarkupFormatter"/>
-  <jdks>
-    <jdk>
-      <name>javalocal</name>
-      <home>/usr/lib/jvm/java-8-openjdk-amd64</home>
-      <properties/>
-    </jdk>
-  </jdks>
+  <jdks/>
   <viewsTabBar class="hudson.views.DefaultViewsTabBar"/>
   <myViewsTabBar class="hudson.views.DefaultMyViewsTabBar"/>
   <clouds/>
@@ -38,33 +32,14 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
-    <listView>
-      <owner class="hudson" reference="../../.."/>
-      <name>springboot-web-ui</name>
-      <filterExecutors>false</filterExecutors>
-      <filterQueue>false</filterQueue>
-      <properties class="hudson.model.View$PropertyList"/>
-      <jobNames>
-        <comparator class="hudson.util.CaseInsensitiveComparator"/>
-        <string>BUILD</string>
-        <string>CHECKOUT</string>
-      </jobNames>
-      <jobFilters/>
-      <columns>
-        <hudson.views.StatusColumn/>
-        <hudson.views.WeatherColumn/>
-        <hudson.views.JobColumn/>
-        <hudson.views.LastSuccessColumn/>
-        <hudson.views.LastFailureColumn/>
-        <hudson.views.LastDurationColumn/>
-        <hudson.views.BuildButtonColumn/>
-      </columns>
-      <recurse>false</recurse>
-    </listView>
   </views>
   <primaryView>all</primaryView>
   <slaveAgentPort>-1</slaveAgentPort>
   <label></label>
+  <crumbIssuer class="hudson.security.csrf.DefaultCrumbIssuer">
+    <excludeClientIPFromCrumb>true</excludeClientIPFromCrumb>
+  </crumbIssuer>
   <nodeProperties/>
   <globalNodeProperties/>
+  <noUsageStatistics>true</noUsageStatistics>
 </hudson>
