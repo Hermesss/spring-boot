@@ -26,16 +26,6 @@
         home: "{{ jenkins_home }}"
         shell: "/bin/false"
         state: present
-    - name: Set JENKINS_HOME
-      lineinfile:
-        dest: /etc/default/jenkins
-        line: "JENKINS_HOME={{ jenkins_home }}"
-        regexp: '^JENKINS_HOME='
-    - name: Set Jenkins port
-      lineinfile:
-        dest: /etc/default/jenkins
-        regexp: '^HTTP_PORT='
-        line: "HTTP_PORT={{ jenkins_port }}"
 
     - name: Add Jenkins apt repository key.
       apt_key:
@@ -57,6 +47,18 @@
       service:
         name: jenkins
         state: stopped
+
+    - name: Set JENKINS_HOME
+      lineinfile:
+        dest: /etc/default/jenkins
+        line: "JENKINS_HOME={{ jenkins_home }}"
+        regexp: '^JENKINS_HOME='
+
+    - name: Set Jenkins port
+      lineinfile:
+        dest: /etc/default/jenkins
+        regexp: '^HTTP_PORT='
+        line: "HTTP_PORT={{ jenkins_port }}"
 
     - name: Create initialization scripts directory
       file: path={{ jenkins_home }}/init.groovy.d
@@ -108,8 +110,21 @@
         name: jenkins
         state: started
 
-
-    
+    - name: Wait for Jenkins to start up
+      uri:
+        url: http://localhost:8080
+        status_code: 200
+        user: "{{ jenkins_admin_username }}"
+        password: "{{ jenkins_admin_password }}"
+        timeout: 5
+        force_basic_auth: yes
+      register: jenkins_service_status
+      retries: 10
+      delay: 5
+      until: >
+        'status' in jenkins_service_status and
+        jenkins_service_status['status'] == 200
+        
     - name: Install plugins
       jenkins_plugin:
         name: "{{ item }}"
@@ -125,19 +140,29 @@
         name: jenkins
         state: stopped
 
-    - name: Job directories are present
+    # - name: Job directories are present
+    #   file:
+    #     path: "{{ jenkins_home }}/jobs/{{ item }}"
+    #     state: directory
+    #     mode: 0777
+    #   with_items: "{{ jenkins_jobs }}"
+
+    # - name: Jobs are present
+    #   copy:
+    #     src: "{{ jenkins_source_dir_jobs }}/{{ item }}/config.xml"
+    #     dest: "{{ jenkins_home }}/jobs/{{ item }}/config.xml"
+    #     mode: 0777
+    #   with_items: "{{ jenkins_jobs }}"
+
+    - name: Ensure correct ownership of JENKINS_HOME directory
       file:
-        path: "{{ jenkins_home }}/jobs/{{ item }}"
+        path: "{{ jenkins_home }}"
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+        mode: 0755
+        recurse: yes
         state: directory
-        mode: 0777
-      with_items: "{{ jenkins_jobs }}"
- 
-    - name: Jobs are present
-      copy:
-        src: "{{ jenkins_source_dir_jobs }}/{{ item }}/config.xml"
-        dest: "{{ jenkins_home }}/jobs/{{ item }}/config.xml"
-        mode: 0777
-      with_items: "{{ jenkins_jobs }}"
+
 
     - name: Start the server
       service:

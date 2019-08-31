@@ -5,14 +5,21 @@ jenkins_admin_username: jenkins
 jenkins_admin_password: jenkins
 ansible_ssh_private_key_file: "/Users/admin/awskey/testkp.pem"
 ansible_ssh_user: "ubuntu"
-jenkins_config_owner: "ubuntu"
-jenkins_config_group: "ubuntu"
-jenkins_source_dir_configs: "{{ playbook_dir }}/files/jenkins-configs"
+jenkins_config_owner: "jenkins"
+jenkins_config_group: "jenkins"
+jenkins_source_dir_configs: "{{ playbook_dir }}/roles/deploy_devtools/files/jenkins-configs"
 jenkins_source_dir_jobs: "{{ jenkins_source_dir_configs }}/jobs"
 jenkins_source_config_xml: "{{ jenkins_source_dir_configs }}/config.xml"
 jenkins_jobs: [graduate]
+jenkins_plugin_timeout: 300
 jenkins_plugins:
   - git
+  - maven
+  - pipeline
+  - pipeline-stage-view
+  - artifactory
+  - github
+  - matrix-auth
 jenkins_url: "http://127.0.0.1"  # The url that Jenkins will be accessible on
 jenkins_port: "8080"  # The port that Jenkins will listen on
 jenkins_admin: "admin@example.com"  # The administrator email address for the server  
