@@ -14,8 +14,9 @@
         - apt-transport-https
         - openjdk-8-jdk
         - git
-        - maven
         state: present
+    - import_tasks: maven.yml
+
     - name: Create Jenkins group
       group:
         name: "{{ jenkins_config_group }}"
