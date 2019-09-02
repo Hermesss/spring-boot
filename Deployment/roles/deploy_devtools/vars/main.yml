@@ -3,7 +3,7 @@
 jenkins_home: "/var/lib/jenkins"
 jenkins_admin_username: jenkins
 jenkins_admin_password: jenkins
-ansible_ssh_private_key_file: "/Users/admin/awskey/testkp.pem"
+ansible_ssh_private_key_file: "~/awskey/testkp1.pem"
 ansible_ssh_user: "ubuntu"
 jenkins_config_owner: "jenkins"
 jenkins_config_group: "jenkins"

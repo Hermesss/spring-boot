@@ -64,6 +64,17 @@ from_port = 22
 from_port = 8080
     to_port = 8080
     protocol = "tcp"
+
+  }
+  
+  ingress {
+    cidr_blocks = [
+      "0.0.0.0/0"
+    ]
+from_port = 8081
+    to_port = 8081
+    protocol = "tcp"
+
   }
 // Terraform removes the default rule
   egress {
@@ -110,8 +121,17 @@ resource "aws_instance" "artifactory" {
   security_groups = ["${aws_security_group.ingress-all-test.id}"]
   subnet_id = "${aws_subnet.subnet-one.id}"
 
+  connection {
+    host = "${aws_instance.artifactory.public_ip}"
+    private_key = "${file(var.private_key)}"
+    user        = "ubuntu"
+  }
+  provisioner "remote-exec" {
+    inline = ["sudo apt-get -qq install python -y"]
+  }
+
   tags = {
-    Name = "arifactory"
+    Name = "artifactory"
   }
 
 }
@@ -122,6 +142,14 @@ resource "aws_instance" "qa" {
   security_groups = ["${aws_security_group.ingress-all-test.id}"]
   subnet_id = "${aws_subnet.subnet-one.id}"
 
+  connection {
+    host = "${aws_instance.qa.public_ip}"
+    private_key = "${file(var.private_key)}"
+    user        = "ubuntu"
+  }
+  provisioner "remote-exec" {
+    inline = ["sudo apt-get -qq install python -y"]
+  }
   tags = {
     Name = "qa"
   }
@@ -133,7 +161,15 @@ resource "aws_instance" "ci" {
   key_name = "${var.ami_key_pair_name}"
   security_groups = ["${aws_security_group.ingress-all-test.id}"]
   subnet_id = "${aws_subnet.subnet-one.id}"
-  
+
+  connection {
+    host = "${aws_instance.ci.public_ip}"
+    private_key = "${file(var.private_key)}"
+    user        = "ubuntu"
+  }
+  provisioner "remote-exec" {
+    inline = ["sudo apt-get -qq install python -y"]
+  }
   tags = {
     Name = "ci"
   }

@@ -6,7 +6,7 @@ variable "ami_id" {
   default = "ami-0d73c05040ee827f7"
 }
 variable "ami_key_pair_name" {
-  default = "testkp"
+  default = "testkp1"
 }
 variable "profile" {
   default = "default"
@@ -17,7 +17,7 @@ variable "region" {
   }
 
 variable "private_key" {
-  default = "~/awskey/testkp.pem"
+  default = "~/awskey/testkp1.pem"
 }
 variable "ansible_user" {
   default = "ubuntu"
