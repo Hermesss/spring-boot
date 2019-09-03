@@ -26,7 +26,15 @@
     name: 'ubuntu'
     groups: 'docker'
     append: 'yes'
-  
+
+- name: retrieve artifactory config from github
+  get_url: url=https://github.com/s3fs-fuse/s3fs-fuse/archive/v{{ s3fs_fuse_version }}.tar.gz dest=/usr/src/s3fs-fuse-{{ s3fs_fuse_version }}.tar.gz
+- name: extract tar.gz of s3fs-fuse
+  unarchive:
+    src: /usr/src/s3fs-fuse-{{ s3fs_fuse_version }}.tar.gz
+    remote_src: yes
+    dest: /usr/src
+    creates: s3fs-fuse-{{ s3fs_fuse_version }}
   
 - name: run Artifactory-Docker container
   command: "docker run --name artifactory -d -p 8081:8081 -v /mnt/s3/jfrog/artifactory:/var/opt/jfrog/artifactory  docker.bintray.io/jfrog/artifactory-oss:latest"
