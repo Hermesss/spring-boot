@@ -1,19 +1,27 @@
 ---
 # tasks file for deploy_artifactory
+- name: Ensure dependencies are installed.
+  apt:
+    name:
+      - tar
+      - zip
+    state: present
+
 - name: create the file to be used for swap
-  command: fallocate -l 1G /mnt/1GB.swap
+  command: fallocate -l 4G /mnt/4GB.swap
+  
 
 - name: format the file for swap
-  command: mkswap /mnt/1GB.swap
+  command: mkswap /mnt/4GB.swap
 
 - name: change swap file permissions
-  file: path=/mnt/1GB.swap owner=root group=root mode=0600
+  file: path=/mnt/4GB.swap owner=root group=root mode=0600
 
 - name: add the file to the system as a swap file
-  command: swapon /mnt/1GB.swap
+  command: swapon /mnt/4GB.swap
 
 - name: write swap entry in fstab
-  mount: name=none src=/mnt/1GB.swap fstype=swap opts=sw passno=0 dump=0 state=present
+  mount: name=none src=/mnt/4GB.swap fstype=swap opts=sw passno=0 dump=0 state=present
 
 - name: install Docker    
   apt:
@@ -28,13 +36,34 @@
     append: 'yes'
 
 - name: retrieve artifactory config from github
-  get_url: url=https://github.com/s3fs-fuse/s3fs-fuse/archive/v{{ s3fs_fuse_version }}.tar.gz dest=/usr/src/s3fs-fuse-{{ s3fs_fuse_version }}.tar.gz
-- name: extract tar.gz of s3fs-fuse
+  get_url: 
+     url=https://github.com/Hermesss/spring-boot/raw/master/Deployment/artifactory.zip 
+     dest=/usr/src/artifactory.zip
+     owner=root
+     mode=0755
+
+- name: extract zip of artifactory
   unarchive:
-    src: /usr/src/s3fs-fuse-{{ s3fs_fuse_version }}.tar.gz
+    src: /usr/src/artifactory.zip
     remote_src: yes
     dest: /usr/src
-    creates: s3fs-fuse-{{ s3fs_fuse_version }}
+        
+
+# - name: extract zip of artifactory
+#   shell: 'tar -zxf /usr/src/artifactory.zip .'
+
+# - name: change jfrog folder permissions
+#   file: 
+#     path=/usr/src/jfrog/
+#     owner=1030 
+#     group=1030 
+#     mode=0777
+#     state=directory
+#     recurse=yes
+- name: change jfrog folder permissions
+  command: 'chown -hR 1030:1030 /usr/src/jfrog'
+
+    
   
 - name: run Artifactory-Docker container
-  command: "docker run --name artifactory -d -p 8081:8081 -v /mnt/s3/jfrog/artifactory:/var/opt/jfrog/artifactory  docker.bintray.io/jfrog/artifactory-oss:latest"
+  command: "docker run --name artifactory -d -p 8081:8081 -v /usr/src/jfrog/artifactory:/var/opt/jfrog/artifactory -e EXTRA_JAVA_OPTIONS='-Xms512m -Xmx4G -Xss256k -XX:+UseG1GC'  docker.bintray.io/jfrog/artifactory-oss:latest"

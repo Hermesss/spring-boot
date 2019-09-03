@@ -13,6 +13,6 @@
     ansible_ssh_user: "ubuntu"
   become: yes
   roles:
-   - bastiaanvanassche.s3fs-fuse
+   #- bastiaanvanassche.s3fs-fuse
    - deploy_artifactory
    
