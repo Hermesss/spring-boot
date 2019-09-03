@@ -20,6 +20,13 @@
       update_cache: yes
       name: docker.io
       state: present
+
+- name: 'add users to docker group'
+  user:
+    name: 'ubuntu'
+    groups: 'docker'
+    append: 'yes'
+  
   
 - name: run Artifactory-Docker container
   command: "docker run --name artifactory -d -p 8081:8081 -v /mnt/s3/jfrog/artifactory:/var/opt/jfrog/artifactory  docker.bintray.io/jfrog/artifactory-oss:latest"
