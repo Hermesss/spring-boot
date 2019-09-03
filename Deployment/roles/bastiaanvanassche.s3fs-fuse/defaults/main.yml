@@ -1,0 +1,11 @@
+---
+s3fs_fuse_version: "1.84"
+s3fs_fuse_access_key_id: AKIA5YEGRTHJWWVAESGY
+s3fs_fuse_secret_access_key: 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
+s3fs_fuse_bucket: artifactorystorage
+s3fs_fuse_mount_point: "/mnt/s3"
+s3fs_fuse_mount_point_permissions: "0777"
+s3fs_fuse_url: "http://s3.amazonaws.com"
+s3fs_fuse_option_flags:
+  - "allow_other"
+  - "nonempty"
