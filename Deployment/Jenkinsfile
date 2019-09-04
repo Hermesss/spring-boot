@@ -30,10 +30,10 @@ pipeline {
             steps {
                 rtServer (
                     id: "Artifactory",
-                    url: "http://localhost:8081/artifactory",
+                    url: "http://artifactory:8081/artifactory",
                     // If you're using username and password:
                     username: "jenkins",
-                    password: "medion88"
+                    password: "jenkins88"
                 )      
                 rtUpload (
                     serverId: "Artifactory",
@@ -58,7 +58,7 @@ pipeline {
             steps {
                 dir ('Deployment') {
                     echo "====++++Deploying to CI++++===="
-                    sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
+                    sh "ansible-playbook  /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
                 }
             }
 

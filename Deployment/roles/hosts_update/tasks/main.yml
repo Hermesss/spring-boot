@@ -1,0 +1,12 @@
+---
+# tasks file for hosts_update
+
+  - name: Add IP address of all hosts to all hosts
+    become: yes
+    lineinfile:
+      dest: /etc/hosts
+      regexp: '.*{{ item }}$'
+      line: "{{ hostvars[item].ansible_host }} {{hostvars[item]['ec2_tag_Name']}}"
+      state: present
+    when: hostvars[item].ansible_host is defined
+    with_items: "{{ groups.all }}"

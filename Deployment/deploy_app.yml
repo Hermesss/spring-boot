@@ -19,8 +19,8 @@
 
           url: http://{{ artifactory_ip }}:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{BUILD_NUMBER}}.jar # required. HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
           mode: 0755
-          group: den
-          owner: den
+          group: root
+          owner: root
 
     - name: run java app
       become: true

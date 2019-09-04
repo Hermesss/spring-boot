@@ -1,11 +1,11 @@
 ---
-#- hosts: tag_Name_devtools
-#  vars:
-#    ansible_ssh_private_key_file: "~/awskey/testkp.pem"
-#    ansible_ssh_user: "ubuntu"
-# become: yes
-# roles: 
-#   - deploy_devtools
+- hosts: tag_Name_devtools
+  vars:
+   ansible_ssh_private_key_file: "~/awskey/testkp.pem"
+   ansible_ssh_user: "ubuntu"
+  become: yes
+  roles: 
+  - deploy_devtools
 
 - hosts: tag_Name_artifactory
   vars:
@@ -15,4 +15,19 @@
   roles:
    #- bastiaanvanassche.s3fs-fuse
    - deploy_artifactory
-   
+
+- hosts: tag_Name_ci, tag_Name_qa
+  vars:
+   ansible_ssh_private_key_file: "~/awskey/testkp.pem"
+   ansible_ssh_user: "ubuntu"
+  become: yes
+  roles: 
+  - provision-ci-qa
+
+- hosts: all
+  vars:
+   ansible_ssh_private_key_file: "~/awskey/testkp.pem"
+   ansible_ssh_user: "ubuntu"
+  become: yes
+  roles:
+  - hosts_update

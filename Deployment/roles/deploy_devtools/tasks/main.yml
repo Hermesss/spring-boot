@@ -14,6 +14,7 @@
         - apt-transport-https
         - openjdk-8-jdk
         - git
+        - ansible
         state: present
     - name: Checking if Maven is already installed
       stat: 
@@ -158,11 +159,11 @@
         status_code: 200
         user: "{{ jenkins_admin_username }}"
         password: "{{ jenkins_admin_password }}"
-        timeout: 5
+        timeout: 10
         force_basic_auth: yes
       register: jenkins_service_status
       retries: 15
-      delay: 10
+      delay: 15
       until: >
         'status' in jenkins_service_status and
         jenkins_service_status['status'] == 200
@@ -212,3 +213,43 @@
       service:
         name: jenkins
         state: started
+  
+    - name: Create ansible hosts directory
+      file: path=/etc/ansible
+          state=directory
+          owner=root
+          group=root
+          mode=0775 
+
+    - name: create hosts file
+      file: path=/etc/ansible/hosts
+          state=touch
+          owner=root
+          group=root
+          mode=0775
+
+    - name: fill in ansible hosts file on devtools
+      become: yes
+      lineinfile:
+        dest: /etc/ansible/hosts
+        insertbefore: BOF
+        line: "[all:vars]\nansible_ssh_private_key_file=/home/ubuntu/.ssh/testkp.pem"
+        state: present  
+
+    - name: fill in ansible hosts file on devtools
+      become: yes
+      lineinfile:
+        dest: /etc/ansible/hosts
+        regexp: '.*{{ item }}$'
+        line: "[{{hostvars[item]['ec2_tag_Name']}}]\n{{ hostvars[item].ansible_host }}"
+        state: present
+      when: hostvars[item].ansible_host is defined
+      with_items: "{{ groups.all }}"
+
+    - name: copy AWS KP file
+      copy: 
+        src: ~/awskey/testkp.pem
+        dest: /home/ubuntu/.ssh/testkp.pem
+        owner: ubuntu
+        group: ubuntu
+        mode: '0600'

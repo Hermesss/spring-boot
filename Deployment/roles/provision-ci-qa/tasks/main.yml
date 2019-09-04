@@ -1,11 +1,11 @@
 ---
 #- hosts: tag_Name_ci, tag_Name_qa, tag_Name_artifactory
 # tasks file for provision-ci-qa
-  become: yes
-  vars:
-    ansible_ssh_private_key_file: "/Users/admin/awskey/testkp.pem"
-    ansible_ssh_user: "ubuntu"
-  tasks:
+  # become: yes
+  # vars:
+  #   ansible_ssh_private_key_file: "/Users/admin/awskey/testkp.pem"
+  #   ansible_ssh_user: "ubuntu"
+  #tasks:
   - name: install JAVA
     apt:
       update_cache: yes
