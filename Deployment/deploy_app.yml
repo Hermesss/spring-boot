@@ -16,9 +16,9 @@
     - name: get artifact from Artifacorty
       get_url:      
           dest: /tmp # required. Absolute path of where to download the file to.,If C(dest) is a directory, either the server provided filename or, if none provided, the base name of the URL on the remote server will be used. If a directory, C(force) has no effect.,If C(dest) is a directory, the file will always be downloaded (regardless of the C(force) option), but replaced only if the contents changed.
-          url: http://artifactory:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{BUILD_NUMBER}}.jar # required. HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
-          url_username: jenkins
-          url_password: jenkins88
+          url: http://jenkins:jenkins88@artifactory:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{BUILD_NUMBER}}.jar # required. HTTP, HTTPS, or FTP URL in the form (http|https|ftp)://[user[:pass]]@host.domain[:port]/path
+          # url_username: jenkins
+          # url_password: jenkins88
           mode: 0755
           group: ubuntu
           owner: ubuntu
