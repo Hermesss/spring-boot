@@ -69,7 +69,7 @@ pipeline {
             }
             steps {
                 echo "====++++Deploying to QA++++===="
-                sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /var/lib/jenkins/jobs/graduate/workspace/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
+                sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
             }
         }
     }
