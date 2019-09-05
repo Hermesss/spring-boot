@@ -1,9 +1,0 @@
-FROM openjdk:8-jre-alpine
-ARG BUILD_NUMBER
-ARG PORT_NUMBER
-EXPOSE {{ PORT_NUMBER }}
-ADD http://{{ ansible_default_ipv4['address'] }}:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar /tmp
-#RUN chmod +rx /tmp/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar
-#CMD ls -lah /tmp && whoami
-ENTRYPOINT [ "java", "-jar", "/tmp/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar"]
-CMD ["--server.port={{ PORT_NUMBER }}"]

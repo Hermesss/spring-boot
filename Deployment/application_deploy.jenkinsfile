@@ -10,68 +10,41 @@ pipeline {
     }
      
     stages {
-        stage(CHECKOUT) {
-            //git repo checkout
+        stage("Gather Deployment Parameters") {
             steps {
-                git 'https://github.com/Hermesss/spring-boot.git'
-            }
-        }
-        stage(BUILD) {
-            steps {
-                sh "mvn clean  install -f /var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
-                
-                }
-
-
-        }
-        
-        
-        stage(UPLOAD) {
-            steps {
-                rtServer (
-                    id: "Artifactory",
-                    url: "http://localhost:8081/artifactory",
-                    // If you're using username and password:
-                    username: "jenkins",
-                    password: "medion88"
-                )      
-                rtUpload (
-                    serverId: "Artifactory",
-                    spec:
-                        """{
-                        "files": [
-                            {
-                            "pattern": "/var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
-                            "target": "libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar"
-                            }
-                        ]
-                        }"""
-                ) 
-                rtPublishBuildInfo (
-                    serverId: "Artifactory"
-                ) 
-
-            }
-        
-        }
-        stage(CI_DEPLOY) {
-            steps {
-                dir ('Deployment') {
-                    echo "====++++Deploying to CI++++===="
-                    sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/hostst /var/lib/jenkins/workspace/graduate/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
+                timeout(time: 30, unit: 'SECONDS') {
+                    script {
+                        // Show the select input modal
+                       def INPUT_PARAMS = input message: 'Please Provide Parameters', ok: 'Next',
+                                        parameters: [
+                                        choice(name: 'ENVIRONMENT', choices: ['ci','qa'].join('\n'), description: 'Please select the Environment'),
+                                        string(name: 'PORT_NUMBER', defaultValue: '8080', description: 'Port Number to expose'),
+                                        string(name: 'BUILD_NUMBER', defaultValue: '2', description: 'Build Number to Deploy')]
+                        env.ENVIRONMENT = INPUT_PARAMS.ENVIRONMENT
+                        env.BUILD_NUMBER = INPUT_PARAMS.BUILD_NUMBER
+                        env.PORT_NUMBER = INPUT_PARAMS.PORT_NUMBER
+                    }
                 }
             }
+        }
+        stage("Use Deployment Parameters") {
+         steps {
+                script {
+                    echo "All parameters have been set as Environment Variables"
+                    echo "Selected Environment: ${env.ENVIRONMENT}"
+                    echo "Selected BUILD: ${env.BUILD_NUMBER}"
+                    echo "Selected PORT: ${env.PORT_NUMBER}"
 
+                }
+         }
         }
-        stage("deploy to QA") {
-            input {
-                message "Should we deploy to QA env?"
-            }
+
+        stage(DEPLOY) {
             steps {
-                echo "====++++Deploying to QA++++===="
-                sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/hosts /var/lib/jenkins/workspace/graduate/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
+                    echo "${env.BUILD_NUMBER}"
+                    echo "====++++Deploying container build:${env.BUILD_NUMBER} to env:${env.ENVIRONMENT} on port:${env.PORT_NUMBER}++++===="
+                    sh "ansible-playbook /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_containers.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/testkp.pem PORT_NUMBER=${env.PORT_NUMBER} ENV=${env.ENVIRONMENT}' "
+                }
             }
-        }
     }
-    
 }
