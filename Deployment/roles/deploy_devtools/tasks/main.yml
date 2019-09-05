@@ -153,20 +153,12 @@
         name: jenkins
         state: started
 
-    - name: Wait for Jenkins to start up
-      uri:
-        url: http://localhost:8080
-        status_code: 200
-        user: "{{ jenkins_admin_username }}"
-        password: "{{ jenkins_admin_password }}"
-        timeout: 10
-        force_basic_auth: yes
-      register: jenkins_service_status
-      retries: 15
-      delay: 15
-      until: >
-        'status' in jenkins_service_status and
-        jenkins_service_status['status'] == 200
+    - name: Wait untils Jenkins web API is available
+      shell: curl --head --silent http://localhost:8080/cli/
+      register: result
+      until: result.stdout.find("200 OK") != -1
+      retries: 12
+      delay: 5
         
     - name: Install plugins
       jenkins_plugin:

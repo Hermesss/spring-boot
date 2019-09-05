@@ -18,7 +18,7 @@ pipeline {
         }
         stage(BUILD) {
             steps {
-                sh "mvn clean  install -f /var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
+                sh "mvn clean  install -f /var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
                 
                 }
 
@@ -41,7 +41,7 @@ pipeline {
                         """{
                         "files": [
                             {
-                            "pattern": "/var/lib/jenkins/workspace/graduate/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
+                            "pattern": "/var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
                             "target": "libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar"
                             }
                         ]
@@ -58,7 +58,7 @@ pipeline {
             steps {
                 dir ('Deployment') {
                     echo "====++++Deploying to CI++++===="
-                    sh "ansible-playbook  /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
+                    sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
                 }
             }
 
@@ -69,7 +69,7 @@ pipeline {
             }
             steps {
                 echo "====++++Deploying to QA++++===="
-                sh "ansible-playbook -i /var/lib/jenkins/workspace/graduate/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
+                sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i /var/lib/jenkins/jobs/graduate/workspace/Deployment/roles/devtools.ini /var/lib/jenkins/workspace/graduate/Deployment/roles/deploy.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
             }
         }
     }
