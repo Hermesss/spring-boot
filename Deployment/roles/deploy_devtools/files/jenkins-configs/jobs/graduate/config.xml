@@ -20,85 +20,25 @@
       </triggers>
     </org.jenkinsci.plugins.workflow.job.properties.PipelineTriggersJobProperty>
   </properties>
-  <definition class="org.jenkinsci.plugins.workflow.cps.CpsFlowDefinition" plugin="workflow-cps@2.74">
-    <script>pipeline {
-
-    agent any
-    environment {
-        finalname = &quot;spring-boot-smoke-test-web-ui-${env.BUILD_NUMBER}&quot;
-    }
-    tools {
-        maven &quot;LOCALMAVEN&quot;
-        jdk &apos;javalocal&apos;
-    }
-     
-    stages {
-        stage(CHECKOUT) {
-            //git repo checkout
-            steps {
-                git &apos;https://github.com/Hermesss/spring-boot.git&apos;
-            }
-        }
-        stage(BUILD) {
-            steps {
-                sh &quot;mvn clean  install -f /var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true&quot;                 
-                
-                }
-
-
-        }
-        
-        
-        stage(UPLOAD) {
-            steps {
-                rtServer (
-                    id: &quot;Artifactory&quot;,
-                    url: &quot;http://artifactory:8081/artifactory&quot;,
-                    // If you&apos;re using username and password:
-                    username: &quot;jenkins&quot;,
-                    password: &quot;jenkins88&quot;
-                )      
-                rtUpload (
-                    serverId: &quot;Artifactory&quot;,
-                    spec:
-                        &quot;&quot;&quot;{
-                        &quot;files&quot;: [
-                            {
-                            &quot;pattern&quot;: &quot;/var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar&quot;,
-                            &quot;target&quot;: &quot;libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar&quot;
-                            }
-                        ]
-                        }&quot;&quot;&quot;
-                ) 
-                rtPublishBuildInfo (
-                    serverId: &quot;Artifactory&quot;
-                ) 
-
-            }
-        
-        }
-        stage(CI_DEPLOY) {
-            steps {
-                dir (&apos;Deployment&apos;) {
-                    echo &quot;====++++Deploying to CI++++====&quot;
-                    sh &quot;ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e &apos;BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci&apos; -vv&quot;
-                }
-            }
-
-        }
-        stage(&quot;deploy to QA&quot;) {
-            input {
-                message &quot;Should we deploy to QA env?&quot;
-            }
-            steps {
-                echo &quot;====++++Deploying to QA++++====&quot;
-                sh &quot;ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e &apos;BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa&apos;&quot;
-            }
-        }
-    }
-    
-}</script>
-    <sandbox>true</sandbox>
+  <definition class="org.jenkinsci.plugins.workflow.cps.CpsScmFlowDefinition" plugin="workflow-cps@2.74">
+    <scm class="hudson.plugins.git.GitSCM" plugin="git@3.12.0">
+      <configVersion>2</configVersion>
+      <userRemoteConfigs>
+        <hudson.plugins.git.UserRemoteConfig>
+          <url>https://github.com/Hermesss/spring-boot.git</url>
+        </hudson.plugins.git.UserRemoteConfig>
+      </userRemoteConfigs>
+      <branches>
+        <hudson.plugins.git.BranchSpec>
+          <name>*/master</name>
+        </hudson.plugins.git.BranchSpec>
+      </branches>
+      <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+      <submoduleCfg class="list"/>
+      <extensions/>
+    </scm>
+    <scriptPath>Deployment/Jenkinsfile</scriptPath>
+    <lightweight>true</lightweight>
   </definition>
   <triggers/>
   <disabled>false</disabled>
