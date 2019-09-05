@@ -58,7 +58,7 @@ pipeline {
             steps {
                 dir ('Deployment') {
                     echo "====++++Deploying to CI++++===="
-                    sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
+                    sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci' -vv"
                 }
             }
 

@@ -225,7 +225,7 @@
       lineinfile:
         dest: /etc/ansible/hosts
         insertbefore: BOF
-        line: "[all:vars]\nansible_ssh_private_key_file=/home/ubuntu/.ssh/testkp.pem"
+        line: "[all:vars]\nansible_ssh_private_key_file=/var/lib/jenkins/testkp.pem"
         state: present  
 
     - name: fill in ansible hosts file on devtools
@@ -241,7 +241,7 @@
     - name: copy AWS KP file
       copy: 
         src: ~/awskey/testkp.pem
-        dest: /home/ubuntu/.ssh/testkp.pem
-        owner: ubuntu
-        group: ubuntu
+        dest: /var/lib/jenkins/testkp.pem
+        owner: jenkins
+        group: jenkins
         mode: '0600'
