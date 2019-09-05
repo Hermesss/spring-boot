@@ -48,22 +48,8 @@
     remote_src: yes
     dest: /usr/src
         
-
-# - name: extract zip of artifactory
-#   shell: 'tar -zxf /usr/src/artifactory.zip .'
-
-# - name: change jfrog folder permissions
-#   file: 
-#     path=/usr/src/jfrog/
-#     owner=1030 
-#     group=1030 
-#     mode=0777
-#     state=directory
-#     recurse=yes
 - name: change jfrog folder permissions
   command: 'chown -hR 1030:1030 /usr/src/jfrog'
 
-    
-  
 - name: run Artifactory-Docker container
   command: "docker run --name artifactory -d -p 8081:8081 -v /usr/src/jfrog/artifactory:/var/opt/jfrog/artifactory -e EXTRA_JAVA_OPTIONS='-Xms512m -Xmx4G -Xss256k -XX:+UseG1GC'  docker.bintray.io/jfrog/artifactory-oss:latest"

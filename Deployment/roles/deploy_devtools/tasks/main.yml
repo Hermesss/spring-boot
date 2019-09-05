@@ -104,24 +104,26 @@
         line: "HTTP_PORT={{ jenkins_port }}"
 
     - name: Create initialization scripts directory
-      file: path={{ jenkins_home }}/init.groovy.d
+      file: 
+        path={{ jenkins_home }}/init.groovy.d
         state=directory
-        owner=jenkins
-        group=jenkins
+        owner="{{ jenkins_config_owner }}"
+        group="{{ jenkins_config_group }}"
         mode=0775    
         
     - name: Add initialization script to setup basic security
-      template: src=security.groovy.j2
-            dest={{ jenkins_home }}/init.groovy.d/security.groovy
-            owner=jenkins
-            group=jenkins
-            mode=0775   
+      template: 
+        src=security.groovy.j2
+        dest={{ jenkins_home }}/init.groovy.d/security.groovy
+        owner="{{ jenkins_config_owner }}"
+        group="{{ jenkins_config_group }}"
+        mode=0775   
 
     - name: Jenkins - configure | Turn off Jenkins setup wizard
       lineinfile: 
-          dest=/etc/default/jenkins 
-          regexp='^JENKINS_JAVA_OPTIONS=' 
-          line='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
+        dest=/etc/default/jenkins 
+        regexp='^JENKINS_JAVA_OPTIONS=' 
+        line='JENKINS_JAVA_OPTIONS="-Djava.awt.headless=true -Djenkins.install.runSetupWizard=false"'
       notify: restart jenkins
     
     - name: Ensure correct ownership of JENKINS_HOME directory
@@ -136,6 +138,14 @@
       template:
         src: "{{ jenkins_source_config_xml }}"
         dest: "{{ jenkins_home }}/config.xml"
+        mode: 0644
+        owner: "{{ jenkins_config_owner }}"
+        group: "{{ jenkins_config_group }}"
+    
+    - name: Configuration file is up to date (mvn_config.xml)
+      template:
+        src: "{{ jenkins_source_mvnconfig_xml }}"
+        dest: "{{ jenkins_home }}/hudson.tasks.Maven.xml"
         mode: 0644
         owner: "{{ jenkins_config_owner }}"
         group: "{{ jenkins_config_group }}"
@@ -154,11 +164,7 @@
         state: started
 
     - name: Wait untils Jenkins web API is available
-      shell: curl --head --silent http://localhost:8080/cli/
-      register: result
-      until: result.stdout.find("200 OK") != -1
-      retries: 12
-      delay: 5
+      wait_for: "host=127.0.0.1 port={{ jenkins_port }} state=present delay=15 timeout=300"
         
     - name: Install plugins
       jenkins_plugin:
@@ -177,19 +183,19 @@
         name: jenkins
         state: stopped
 
-    # - name: Job directories are present
-    #   file:
-    #     path: "{{ jenkins_home }}/jobs/{{ item }}"
-    #     state: directory
-    #     mode: 0777
-    #   with_items: "{{ jenkins_jobs }}"
+    - name: Job directories are present
+      file:
+        path: "{{ jenkins_home }}/jobs/{{ item }}"
+        state: directory
+        mode: 0777
+      with_items: "{{ jenkins_jobs }}"
 
-    # - name: Jobs are present
-    #   copy:
-    #     src: "{{ jenkins_source_dir_jobs }}/{{ item }}/config.xml"
-    #     dest: "{{ jenkins_home }}/jobs/{{ item }}/config.xml"
-    #     mode: 0777
-    #   with_items: "{{ jenkins_jobs }}"
+    - name: Jobs are present
+      copy:
+        src: "{{ jenkins_source_dir_jobs }}/{{ item }}/config.xml"
+        dest: "{{ jenkins_home }}/jobs/{{ item }}/config.xml"
+        mode: 0777
+      with_items: "{{ jenkins_jobs }}"
 
     - name: Ensure correct ownership of JENKINS_HOME directory
       file:
@@ -207,14 +213,16 @@
         state: started
   
     - name: Create ansible hosts directory
-      file: path=/etc/ansible
+      file: 
+          path=/etc/ansible
           state=directory
-          owner=root
-          group=root
+          owner={{ jenkins_config_owner }}
+          group={{ jenkins_config_owner }}
           mode=0775 
 
     - name: create hosts file
-      file: path=/etc/ansible/hosts
+      file: 
+          path=/etc/ansible/hosts
           state=touch
           owner=root
           group=root
@@ -225,7 +233,7 @@
       lineinfile:
         dest: /etc/ansible/hosts
         insertbefore: BOF
-        line: "[all:vars]\nansible_ssh_private_key_file=/var/lib/jenkins/testkp.pem"
+        line: "[all:vars]\nansible_ssh_private_key_file={{ jenkins_home }}/testkp.pem\nansible_user=ubuntu"
         state: present  
 
     - name: fill in ansible hosts file on devtools
@@ -241,7 +249,7 @@
     - name: copy AWS KP file
       copy: 
         src: ~/awskey/testkp.pem
-        dest: /var/lib/jenkins/testkp.pem
+        dest: "{{ jenkins_home }}/testkp.pem"
         owner: jenkins
         group: jenkins
         mode: '0600'

@@ -2,6 +2,6 @@ FROM openjdk:8-jre-alpine
 ARG BUILD_NUMBER
 ARG PORT_NUMBER
 EXPOSE {{ PORT_NUMBER }}
-ADD http://192.168.1.232:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar /tmp
+ADD http://artifactory:8081/artifactory/libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar /tmp
 ENTRYPOINT [ "java", "-jar", "/tmp/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar"]
 CMD ["--server.port={{ PORT_NUMBER }}"]

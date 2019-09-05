@@ -1,0 +1,9 @@
+<?xml version='1.1' encoding='UTF-8'?>
+<hudson.tasks.Maven_-DescriptorImpl>
+  <installations>
+    <hudson.tasks.Maven_-MavenInstallation>
+      <name>LOCALMAVEN</name>
+      <home>/opt/apache-maven-3.6.1</home>
+      <properties/>
+    </hudson.tasks.Maven_-MavenInstallation>
+  </installations>

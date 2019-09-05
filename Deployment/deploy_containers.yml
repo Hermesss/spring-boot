@@ -1,12 +1,6 @@
 ---
-- name: Gather artifactory facts
-  hosts: artifactory
-  tasks:
-    - setup:
-    - debug: var=
-
 - hosts: "{{ ENV | default('ci') }}"
   become: true
   roles: 
-   - ./roles/deploy-to-ci
-   #- /var/libs/jenkins/workspace/graduate/Deployment/roles/deploy-to-ci
+   - deploy-to-ci
+   

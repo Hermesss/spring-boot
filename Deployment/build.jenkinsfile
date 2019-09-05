@@ -54,24 +54,5 @@ pipeline {
             }
         
         }
-        stage(CI_DEPLOY) {
-            steps {
-                dir ('Deployment') {
-                    echo "====++++Deploying to CI++++===="
-                    sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook  /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=ci'"
-                }
-            }
-
-        }
-        stage("deploy to QA") {
-            input {
-                message "Should we deploy to QA env?"
-            }
-            steps {
-                echo "====++++Deploying to QA++++===="
-                sh "ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook /var/lib/jenkins/jobs/graduate/workspace/Deployment/deploy_app.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ENV=qa'"
-            }
-        }
-    }
-    
+    }    
 }
