@@ -14,6 +14,6 @@
  - name: run docker container
    docker_container:  
      name: springboot
-     image: "denhermesss/graduate:{{ BUILD_NUMBER }}"
+     image: denhermesss/graduate:{{ BUILD_NUMBER }}
      published_ports: "{{PORT_NUMBER}}:{{PORT_NUMBER}}"
      state: started

@@ -1,5 +1,5 @@
 ---
-- hosts: "{{ ENV | default('tag_Name_ci') }}"
+- hosts: "{{ ENV | default('ci') }}"
   become: true
   roles: 
    - deploy-to-ci

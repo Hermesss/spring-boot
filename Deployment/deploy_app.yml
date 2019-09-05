@@ -25,7 +25,7 @@
 
     - name: run java app
       become: true
-      shell: java -jar /tmp/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar --server.port={{ CONTAINER_PORT | default('8080') }}
+      shell: java -jar /tmp/spring-boot-smoke-test-web-ui-{{ BUILD_NUMBER }}.jar --server.port={{ PORT_NUMBER | default('8080') }}
       async: 360
       poll: 0
       
