@@ -8,7 +8,9 @@ pipeline {
         maven "LOCALMAVEN"
         jdk 'javalocal'
     }
-     
+    triggers {
+        pollSCM('* * * * *') 
+        
     stages {
         stage(CHECKOUT) {
             //git repo checkout

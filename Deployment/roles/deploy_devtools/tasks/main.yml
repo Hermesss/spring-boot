@@ -163,8 +163,16 @@
         name: jenkins
         state: started
 
-    - name: Wait untils Jenkins web API is available
-      wait_for: "host=127.0.0.1 port={{ jenkins_port }} state=present delay=30 timeout=600"
+    - name: wait for service to boot
+      uri:
+        url: "http://devtools:8080/"
+        status_code: 200
+        validate_certs: False
+      register: result
+      until: result | succeeded
+      retries: 8
+      delay: 20
+      ignore_errors: yes
         
     - name: Install plugins
       jenkins_plugin:
