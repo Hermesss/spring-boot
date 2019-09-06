@@ -18,7 +18,7 @@ pipeline {
         }
         stage(BUILD) {
             steps {
-                sh "mvn clean  install -f /var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
+                sh "mvn clean  install -f /var/lib/jenkins/jobs/build/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/pom.xml -Dmaven.test.skip=true -Dmaven.test.failure.ignore=true"                 
                 
                 }
 
@@ -41,7 +41,7 @@ pipeline {
                         """{
                         "files": [
                             {
-                            "pattern": "/var/lib/jenkins/jobs/graduate/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
+                            "pattern": "/var/lib/jenkins/jobs/build/workspace/spring-boot-smoke-tests/spring-boot-smoke-test-web-ui/target/*.jar",
                             "target": "libs-snapshot-local/org/springframework/boot/spring-boot-smoke-test-web-ui/2.2.0.BUILD-SNAPSHOT/${env.finalname}.jar"
                             }
                         ]
