@@ -43,7 +43,7 @@ pipeline {
             steps {
                     echo "${env.BUILD_NUMBER}"
                     echo "====++++Deploying container build:${env.BUILD_NUMBER} to env:${env.ENVIRONMENT} on port:${env.PORT_NUMBER}++++===="
-                    sh "ansible-playbook /var/lib/jenkins/jobs/deploy/workspace/Deployment/deploy_containers.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} ansible_user=ubuntu ansible_ssh_private_key_file=/var/lib/jenkins/testkp.pem PORT_NUMBER=${env.PORT_NUMBER} ENV=${env.ENVIRONMENT}' "
+                    sh "ansible-playbook /var/lib/jenkins/jobs/deploy/workspace/Deployment/deploy_containers.yml -e 'BUILD_NUMBER=${env.BUILD_NUMBER} PORT_NUMBER=${env.PORT_NUMBER} ENV=${env.ENVIRONMENT}' "
                 }
             }
     }
