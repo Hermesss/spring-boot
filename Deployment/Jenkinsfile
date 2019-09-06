@@ -10,7 +10,7 @@ pipeline {
     }
     triggers {
         pollSCM('* * * * *') 
-
+    }
     stages {
         stage(CHECKOUT) {
             //git repo checkout
@@ -26,8 +26,7 @@ pipeline {
 
 
         }
-        
-        
+         
         stage(UPLOAD) {
             steps {
                 rtServer (
@@ -76,4 +75,4 @@ pipeline {
         }
     }
     
-}}
+}
