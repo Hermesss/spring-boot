@@ -164,7 +164,7 @@
         state: started
 
     - name: Wait untils Jenkins web API is available
-      wait_for: "host=127.0.0.1 port={{ jenkins_port }} state=present delay=15 timeout=300"
+      wait_for: "host=127.0.0.1 port={{ jenkins_port }} state=present delay=30 timeout=600"
         
     - name: Install plugins
       jenkins_plugin:

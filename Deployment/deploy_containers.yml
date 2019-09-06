@@ -1,8 +1,8 @@
 ---
 - hosts: "{{ ENV | default('ci') }}"
   vars:
-    PORT_NUMBER: "{{PORT_NUMBER}}"
-    BUILD_NUMBER: "{{BUILD_NUMBER}}"
+    - PORT_NUMBER: "{{PORT_NUMBER}}"
+    - BUILD_NUMBER: "{{BUILD_NUMBER}}"
   become: true
   roles: 
    - deploy-to-ci

@@ -10,7 +10,10 @@
  - name: install pip depends
    pip:
     name: docker
-
+ - name: Params
+   debug:
+    msg: "BN:{{ BUILD_NUMBER }} PN: {{PORT_NUMBER}}"
+    
  - name: run docker container
    docker_container:  
      name: springboot
